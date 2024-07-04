@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+    jenkins:
+        image: jenkins/jenkins:latest
+        container_name: jenkins
+        restart: always
+        ports:
+            - 8080:8080
+        volumes:
+            - /sotrage/jenkins-home:/var/jenkins_home
+
+    tomcat:
+        image: tomcat:9.0
+        container_name: tomcat
+        restart: always
+        ports:
+            - 8888:8080
+        volumes:
+            - /storage/tomcat-home:/usr/local/tomcat
+
+    mysql:
+        image: mysql
+        container_name: mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ivan
+            MYSQL_DATABASE: gogs
+            MYSQL_USER: ivan
+            MYSQL_PASSWORD: ivan
+        volumes:
+            - /storage/mysql-data:/var/lib/mysql
+
+    gogs:
+        image: gogs
+        container_name: gogs
+        restart: always
+        depends_on:
+            - mysql
+        ports:
+            - 10080:3000
+        volumes:
+            - /storage/gogs-git-data:/data
+
+    nagios:
+        image: manios/nagios:latest
+        container_name: nagios
+        restart: always
+        ports:
+            - 0.0.0.0:8090:80
+        volumes:
+            - /storage/nagios-data:/opt/nagios/etc/
